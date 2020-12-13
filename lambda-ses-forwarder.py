@@ -4,7 +4,7 @@ lambda-ses-forwarder.py by Chris Marcellino, Version 1.0.
 Python3 rewrite based on [aws_lambda_ses_forwarder_python3](https://github.com/tedder/aws_lambda_ses_forwarder_python3),
 which was a port of the original node.js forwarder [aws-lambda-ses-forwarder](https://github.com/arithmetric/aws-lambda-ses-forwarder),
 but re-written to allow bounce messages, store the mapping in environment variables with JSON,
-automatic determination of 'noreply' address and better email address parsing using built in
+automatic determination of 'noreply' address and better email address parsing using built-in
 Python utility functions. 
 
 Requires ses:SendRawEmail, ses:SendEmail, and s3:GetObject role policy permission (plus
