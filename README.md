@@ -9,18 +9,18 @@ under MIT license.)
 
 Compared to previous versions, this version:
 - has been re-written to allow bounce messages to the sender, for example when
-raw size of the message is > 10 MB and cannot be forwarded
-(note that this means that the role policy also requires SendEmail access and not
-just SendRawEmail as in other versions)
+ raw size of the message is > 10 MB and cannot be forwarded
+ (note that this means that the role policy also requires SendEmail access and not
+ just SendRawEmail as in other versions)
 - store the mapping and bucket name in environment variables with JSON
 - permit automatic determination of 'noreply' address to be relative to (and
-match the) receiving domain name
+ match the) receiving domain name
 - better email address parsing using built in python methods to allow for from
-emails to have names and emails or just email addresses
+ emails to have names and emails or just email addresses
 - remove unnecessary options in the spirit of minimalism (no prefix, and
-mandatory no-reply addressing though configurable)
+ mandatory no-reply addressing though configurable)
 - this uses slightly less memory and is 50% faster than the node.js version on
-small emails (though similar for large emails)
+ small emails (though similar for large emails)
 
 Recommend a 512 MB Lambda configuration to allow for bouncing of messages of
 arbitrary size, but normally uses less than 128 MB. The time-GB product and
@@ -81,9 +81,10 @@ FORWARD_MAPPING is a JSON dictionary of recipient to destination mapping (entrie
 are string:string). The strings can be full email addresses, usernames, or usernames
 and prefixes and they will match with precedence for the most specific pattern first.
 
-VERIFIED_FROM_EMAIL can be either omitted, a username or full email address to
-return messages to. If a username is provided, the domain will be the receiving address's
-domain. 
+VERIFIED_FROM_EMAIL can be either omitted, a username or full email address to use
+as a from address (replies go to the original sender of course). If a username
+is provided (as opposed to a complete email address), the domain used will be
+receiving address's domain. 
 
 4. Configure the lambda role policy to the following (you can create a default rule and then
 modify it in IAM using the link in lambda):
@@ -138,14 +139,14 @@ Otherwise, you can use an existing one.
  - On the Actions configuration page, add an S3 action first and then an Lambda
  action.
 
- - For the S3 action: Create or choose an existing S3 bucket. Optionally, add an
- object key prefix. Leave Encrypt Message unchecked and SNS Topic set to [none].
+ - For the S3 action: Create or choose an existing S3 bucket. Optionally,
+ Leave Encrypt Message unchecked (off) and SNS Topic set to [none].
 
  - For the Lambda action: Choose the SesForwarder Lambda function. Leave
  Invocation Type set to Event and SNS Topic set to [none].
 
  - Finish by naming the rule, ensuring it's enabled and that spam and virus
- checking are used.
+ checking are used to avoid having your domain blocked by others by forwarding spam. 
 
  - If you get an error like "Could not write to bucket", follow step 7 before
  completing this one
@@ -180,5 +181,6 @@ likely need to adjust the bucket policy statement with one like this:
  }
  ```
 
-9. Optionally set the S3 lifecycle for this bucket to delete/expire objects
-after a n days to clean up the saved emails.
+9. Recommended, but optionally set the S3 lifecycle for this bucket to
+delete/expire objects after a 1 (or a few) day(s) to clean up the saved
+emails unless you wish to maintain them them for other purposes in S3.
