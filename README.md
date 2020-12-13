@@ -27,7 +27,7 @@ arbitrary size, but normally uses less than 128 MB. The time-GB product and
 hence price per email is similar at all relatively small lambda sizes under
 approximately 1 GB in my testing.
 
-#Instructions
+# Instructions
 
 1. Caveats:
 - SES only allows sending email from addresses or domains that are verified.
