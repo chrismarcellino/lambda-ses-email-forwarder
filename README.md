@@ -4,7 +4,7 @@ Yet another Python3 script for AWS Lambda that uses the inbound/outbound
 capabilities of AWS Simple Email Service (SES) to run a "serverless" email
 forwarding service.
 
-(This README.md is adapted from [aws_lambda_ses_forwarder_python3](https://github.com/tedder/aws_lambda_ses_forwarder_python3)
+(This README.md is adapted from [aws_lambda_ses_forwarder](https://github.com/arithmetric/aws-lambda-ses-forwarder)
 under MIT license.)
 
 Compared to previous versions, this version:
