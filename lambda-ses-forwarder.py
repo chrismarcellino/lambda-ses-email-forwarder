@@ -1,10 +1,22 @@
 """
-Python3 port based on [aws_lambda_ses_forwarder_python3](https://github.com/tedder/aws_lambda_ses_forwarder_python3),
-which was a port of the original node.js forwarder [aws-lambda-ses-forwarder](https://github.com/arithmetric/aws-lambda-ses-forwarder),
-but re-written to allow bounce messages, store the mapping in environment variables with JSON, automatic determination of
-'noreply' address and better email address parsing using built in python methods. Essentially no code remains from the original versions. 
+lambda-ses-forwarder.py by Chris Marcellino, Version 1.0.
 
-See README.md for instructions.
+Python3 rewrite based on [aws_lambda_ses_forwarder_python3](https://github.com/tedder/aws_lambda_ses_forwarder_python3),
+which was a port of the original node.js forwarder [aws-lambda-ses-forwarder](https://github.com/arithmetric/aws-lambda-ses-forwarder),
+but re-written to allow bounce messages, store the mapping in environment variables with JSON,
+automatic determination of 'noreply' address and better email address parsing using built in
+Python utility functions. 
+
+Requires ses:SendRawEmail, ses:SendEmail, and s3:GetObject role policy permission (plus
+CloudWatch logging if desired). See README.md for instructions on how to deliver messages
+to an S3 bucket, and optionally set them to expire there to avoid accumulation. Forwarding
+domains (or emails) must be verified, and you must be out of the sandbox to forward to
+non-verified domains. 
+
+The required environment variables are SES_INCOMING_BUCKET, which must be the name of the
+SES rule-set delivery bucket, and FORWARD_MAPPING which should be a 1:1 mapping of receiving
+addresses to forwarding addresses in JSON, for example:
+{"chris": "chris@destination.org", "friend@example.com": "friend@destination.com"}
 """
 
 import email
@@ -69,17 +81,19 @@ def handler(event, context):
             verified_from_email = verified_from_email + '@' + recipient.split('@')[1]
         
         # must accept from addresses with or without a name element: e.g. "me@example.com" or "Name(s) <me@example.com>".
-        # if we don't have a sender use, copy the original email to use as a sender name so the recipient can identify the sender.
+        # if we don't have a sender name, copy the original email address to use as a sender name so the recipient
+        # can identify the sender.
         from_tuple = parseaddr(original_from)
         from_name = from_tuple[0]
         if not from_name:
             from_name = from_tuple[1]
         msg['From'] = formataddr((from_name, verified_from_email))
         
-        # send replies to the original sender
+        # send replies to the original sender (note that this will be the original_from if there was no reply_to; see above)
         msg['Reply-To'] = reply_to
         
-        # try to match the entire email address, then try matching just user portion with any any suffixes, and then without the suffixes
+        # try to match the entire email address, then try matching just user portion with any '+' suffixes,
+        # and then without the suffixes, in that order
         recipient = recipient.lower();
         forward_to = FORWARD_MAPPING.get(recipient)
         if not forward_to:
