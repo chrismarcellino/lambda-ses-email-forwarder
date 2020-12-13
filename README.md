@@ -8,14 +8,14 @@ forwarding service.
 under MIT license.)
 
 Compared to previous versions, this version:
-- has been re-written to allow bounce messages to the sender, for example when
- raw size of the message is > 10 MB and cannot be forwarded
+- has been re-written to allow bounce messages to be sent to the sender,
+ for example when raw size of the message is > 10 MB and cannot be forwarded
  (note that this means that the role policy also requires SendEmail access and not
  just SendRawEmail as in other versions)
 - store the mapping and bucket name in environment variables with JSON
 - permit automatic determination of 'noreply' address to be relative to (and
  match the) receiving domain name
-- better email address parsing using built in python methods to allow for from
+- better email address parsing using built-in Python methods to allow for from
  emails to have names and emails or just email addresses
 - remove unnecessary options in the spirit of minimalism (no prefix, and
  mandatory no-reply addressing though configurable)
@@ -54,6 +54,9 @@ From header is changed to display the original sender but to be sent from a
   From: Jane Example <forwarder@example.com>
   Reply-To: jane@example.com
   ```
+
+If the original message has a separate Reply-To header, this is used verbatim
+as the Reply-To in the forwarded message.
 
 - SES only allows receiving email sent to addresses within verified domains. For
 more information, see:
@@ -148,7 +151,7 @@ Otherwise, you can use an existing one.
  - Finish by naming the rule, ensuring it's enabled and that spam and virus
  checking are used to avoid having your domain blocked by others by forwarding spam. 
 
- - If you get an error like "Could not write to bucket", follow step 7 before
+ - If you get an error like "Could not write to bucket", follow step 8 before
  completing this one
 
  - If you are asked by SES to add permissions to access `lambda:InvokeFunction`,

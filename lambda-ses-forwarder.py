@@ -7,16 +7,19 @@ but re-written to allow bounce messages, store the mapping in environment variab
 automatic determination of 'noreply' address and better email address parsing using built-in
 Python utility functions. 
 
-Requires ses:SendRawEmail, ses:SendEmail, and s3:GetObject role policy permission (plus
+Requires ses:SendRawEmail, ses:SendEmail, and s3:GetObject role policy permissions (plus
 CloudWatch logging if desired). See README.md for instructions on how to deliver messages
-to an S3 bucket, and optionally set them to expire there to avoid accumulation. Forwarding
-domains (or emails) must be verified, and you must be out of the sandbox to forward to
-non-verified domains. 
+to an S3 bucket and fire this lambda, and optionally set them to expire there to avoid
+accumulation. Forwarding domains (or emails) must be verified, and you must be out of the
+sandbox to forward to non-verified domains. 
 
 The required environment variables are SES_INCOMING_BUCKET, which must be the name of the
-SES rule-set delivery bucket, and FORWARD_MAPPING which should be a 1:1 mapping of receiving
-addresses to forwarding addresses in JSON, for example:
-{"chris": "chris@destination.org", "friend@example.com": "friend@destination.com"}
+SES rule-set rule delivery bucket, and FORWARD_MAPPING which should be a 1:1 mapping of receiving
+addresses or usernames (with or without a '+' prefix) to forwarding addresses in JSON, 
+for example:
+{"chris": "chris@destination.org", "friend@example.com": "friend@destination.com"}.
+Note that a key of "chris" will also foward all "chris+xyz" suffixes, unless there is a
+more specific rule for the suffix as well. 
 """
 
 import email
