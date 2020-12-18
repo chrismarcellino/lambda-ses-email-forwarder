@@ -30,14 +30,13 @@ approximately 1 GB in my testing.
 # Instructions
 
 1. Caveats:
-- SES only allows sending email from addresses or domains that are verified.
+ - SES only allows sending email from addresses or domains that are verified.
 Since this script is meant to allow forwarding email from any sender, the
 message is modified to allow forwarding through SES and reflect the original
 sender. This script adds a Reply-To header with the original sender, but the
 From header is changed to display the original sender but to be sent from a
-'noreply' header.
-
-  For example, if an email sent by `Jane Example <jane@example.com>` to
+'noreply' header.  
+For example, if an email sent by `Jane Example <jane@example.com>` to
   `info@example.com` is processed by this script, the From and Reply-To headers
   will be set to:
 
@@ -46,7 +45,7 @@ From header is changed to display the original sender but to be sent from a
   Reply-To: jane@example.com
   ```
 
-  To override the name of the return address behavior, set a verified from
+  - To override the name of the return address behavior, set a verified from
   address (e.g., forwarder@example.com) in the VERIFIED_FROM_EMAIL environment
   variable and the header will look like this.
 
@@ -54,20 +53,19 @@ From header is changed to display the original sender but to be sent from a
   From: Jane Example <forwarder@example.com>
   Reply-To: jane@example.com
   ```
-
-If the original message has a separate Reply-To header, this is used verbatim
+ - If the original message has a separate Reply-To header, this is used verbatim
 as the Reply-To in the forwarded message.
 
-- SES only allows receiving email sent to addresses within verified domains. For
+ - SES only allows receiving email sent to addresses within verified domains. For
 more information, see:
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-domains.html
 
-- SES only allows sending emails up to 10 MB in size (including attachments
+ - SES only allows sending emails up to 10 MB in size (including attachments
 after encoding). See:
 https://docs.aws.amazon.com/ses/latest/DeveloperGuide/limits.html
 (a bounce will be sent if over or for any other technical limitation)
 
-- Initially SES users are in a sandbox environment that has a number of
+ - Initially SES users are in a sandbox environment that has a number of
 limitations. See:
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/limits.html
 
@@ -78,19 +76,18 @@ fine, however you will need to configure the environment variables and a minimum
 
 3. Set the environment variables of the lambda to configure the script forwarding addresses etc.
 There are two required variables:
-SES_INCOMING_BUCKET is the S3 bucket to pull email from. 
 
-FORWARD_MAPPING is a JSON dictionary of recipient to destination mapping (entries
+ - `SES_INCOMING_BUCKET` is the S3 bucket to pull email from.  
+ - `FORWARD_MAPPING` is a JSON dictionary of recipient to destination mapping (entries
 are string:string). The strings can be full email addresses, usernames, or usernames
-and prefixes and they will match with precedence for the most specific pattern first.
-
-VERIFIED_FROM_EMAIL can be either omitted, a username or full email address to use
+and prefixes and they will match with precedence for the most specific pattern first.  
+ - `VERIFIED_FROM_EMAIL` can be either omitted, a username or full email address to use
 as a from address (replies go to the original sender of course). If a username
 is provided (as opposed to a complete email address), the domain used will be
 receiving address's domain. 
 
 4. Configure the lambda role policy to the following (you can create a default rule and then
-modify it in IAM using the link in lambda):
+modify it in IAM using the link in lambda):  
  ```
 {
     "Version": "2012-10-17",
@@ -126,8 +123,7 @@ modify it in IAM using the link in lambda):
 5. In AWS SES, verify the domains for which you want to receive and forward
 email. Also configure the DNS MX record for these domains to point to the email
 receiving (or inbound) SES endpoint. See [SES documentation](http://docs.aws.amazon.com/ses/latest/DeveloperGuide/regions.html#region-endpoints)
-for the email receiving endpoints in each region.
-
+for the email receiving endpoints in each region.  
 If you have the sandbox level of access to SES, then also verify any email
 addresses to which you want to forward email that are not on verified domains.
 
@@ -161,7 +157,7 @@ Otherwise, you can use an existing one.
 and write access to the S3 bucket. When you set up the S3 action in SES, it may
 add a bucket policy statement that denies all users other than root access to
 get objects. This causes access issues from the Lambda script, so you will
-likely need to adjust the bucket policy statement with one like this:
+likely need to adjust the bucket policy statement with one like this:  
  ```
  {
     "Version": "2012-10-17",
