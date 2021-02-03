@@ -1,5 +1,5 @@
 """
-lambda-ses-forwarder.py by Chris Marcellino, Version 1.0.
+lambda-ses-forwarder.py by Chris Marcellino, Version 1.1.
 
 Python3 rewrite based on [aws_lambda_ses_forwarder_python3](https://github.com/tedder/aws_lambda_ses_forwarder_python3),
 which was a port of the original node.js forwarder [aws-lambda-ses-forwarder](https://github.com/arithmetric/aws-lambda-ses-forwarder),
