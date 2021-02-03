@@ -111,14 +111,14 @@ def handler(event, context):
                 logger.info('Forwarded email from <{}> for <{}> to <{}>. SendRawEmail response={}'.format(parseaddr(original_from)[1], recipient, forward_to, json.dumps(o)))
             except ClientError as e:
                 logger.info('Error while forwarding email for {} to {}: {}'.format(recipient, forward_to, e))
-                send_bounce(return_path, forward_to, verified_from_email, e)
+                send_bounce(return_path, recipient, verified_from_email, e)
         
     if not at_least_one_recipient_found:
         logger.error('Check SES rule set; no recipient found in forwarding map for message: {}'.format(msg))
 
 
 # sends a bounce message, for example, for malformed email or email greater than SES's sending size limits
-def send_bounce(return_path, forward_to, verified_from_email, e):
+def send_bounce(return_path, recipient, verified_from_email, e):
     # remove any display name from the return path
     return_path = parseaddr(return_path)[1]
     
@@ -132,14 +132,14 @@ def send_bounce(return_path, forward_to, verified_from_email, e):
                 'Data':('An error occurred while forwarding email for {} to its final destination address. ' +
                         'Check that the size of the email and its attachments are not too large or contact the administrator for assistance. \n' +
                         '\n' +
-                        '({})').format(forward_to, e),
+                        'The error message was: {}').format(recipient, e),
                 'Charset': 'UTF-8'
             }
         }
     }
     try:
         source = formataddr(('Mail Delivery Subsystem', verified_from_email))
-        destination = {'ToAddresses':[return_path]};
+        destination = {'ToAddresses':[return_path],'CcAddresses':[recipient]};
         o = ses.send_email(Source=source, Destination=destination, Message=message);
         logger.info('Sent bounce email to <{}>. SendRawEmail response={}'.format(return_path, json.dumps(o)))
     except ClientError as e:
