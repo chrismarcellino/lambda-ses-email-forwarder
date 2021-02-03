@@ -130,9 +130,10 @@ def send_bounce(return_path, recipient, verified_from_email, e):
         'Body': {
             'Text': {
                 'Data':('An error occurred while forwarding email for {} to its final destination address. ' +
-                        'Check that the size of the email and its attachments are not too large or contact the administrator for assistance. \n' +
+                        'Check that the size of the email and its attachments are not too large or contact the administrator for assistance. ' +
+                        'The error message is below. \n' +
                         '\n' +
-                        'The error message was: {}').format(recipient, e),
+                        '{}\n').format(recipient, e),
                 'Charset': 'UTF-8'
             }
         }
